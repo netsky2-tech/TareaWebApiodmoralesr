@@ -9,8 +9,6 @@ namespace AWEntities.Authentication
     public class user
     {
         public string username { get; set; } = string.Empty;
-        public string password { get; set; } = string.Empty;
-        public byte[] PasswordHash { get; set; }
-        public byte[] PasswordSalt { get; set; }
+        public string pswd { get; set; } = string.Empty;
     }
 }

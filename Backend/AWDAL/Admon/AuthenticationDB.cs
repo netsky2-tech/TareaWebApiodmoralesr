@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Http.Results;
 
 namespace AWDAL.Admon
 {
@@ -31,8 +32,7 @@ namespace AWDAL.Admon
                         command.CommandType = CommandType.StoredProcedure;
                         command.CommandText = "dbo.LoginUser";
                         command.Parameters.AddWithValue("@username", User.username);
-                        command.Parameters.AddWithValue("@PasswordHash", User.PasswordHash);
-                        command.Parameters.AddWithValue("@PasswordSalt", User.PasswordSalt);
+                        command.Parameters.AddWithValue("@password", User.pswd);
 
             
                         command.Parameters.Add("@return", SqlDbType.TinyInt);
@@ -43,7 +43,7 @@ namespace AWDAL.Admon
 
                         command.ExecuteNonQuery();
 
-                        r.Id = Convert.ToInt32(command.Parameters["@ProductCategoryID"].Value);
+                        //r.Id = Convert.ToInt32(command.Parameters["@ProductCategoryID"].Value);
                         r.Outcome = Convert.ToInt32(command.Parameters["@return"].Value) == 0;
                         r.Message = Convert.ToString(command.Parameters["@return_message"].Value);
                     };
@@ -77,8 +77,7 @@ namespace AWDAL.Admon
                         command.CommandType = CommandType.StoredProcedure;
                         command.CommandText = "dbo.registerUser";
                         command.Parameters.AddWithValue("@username", User.username);
-                        command.Parameters.AddWithValue("@PasswordHash", User.PasswordHash);
-                        command.Parameters.AddWithValue("@PasswordSalt", User.PasswordSalt);
+                        command.Parameters.AddWithValue("@password", User.pswd);
 
                         command.Parameters.Add("@Id_user", SqlDbType.Int);
                         command.Parameters["@Id_user"].Direction = ParameterDirection.Output;
@@ -94,6 +93,8 @@ namespace AWDAL.Admon
                         r.Id = Convert.ToInt32(command.Parameters["@Id_user"].Value);
                         r.Outcome = Convert.ToInt32(command.Parameters["@return"].Value) == 0;
                         r.Message = Convert.ToString(command.Parameters["@return_message"].Value);
+
+
                     };
 
                 }

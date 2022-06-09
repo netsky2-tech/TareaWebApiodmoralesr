@@ -13,7 +13,6 @@ namespace AWBLL.Production
 {
     public class AuthenticationBLL
     {
-        private readonly AuthenticationDB dbCategory;
 
         public static Result Login(user User)
         {
