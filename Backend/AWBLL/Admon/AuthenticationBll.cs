@@ -15,9 +15,14 @@ namespace AWBLL.Production
     {
         private readonly AuthenticationDB dbCategory;
 
-        public static Result Insert(user User)
+        public static Result Login(user User)
         {
             return AuthenticationDB.Login(User);
+        }
+        
+        public static Result Register(user User)
+        {
+            return AuthenticationDB.Register(User);
         }
 
     }
