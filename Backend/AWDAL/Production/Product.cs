@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 
 namespace AWDAL.Production
 {
-    public class ProductCategoryDB
+    public class ProductDB
     {
-        public static List<ProductCategory> Get()
+        public static List<Product> Get()
         {
-            List<ProductCategory> categories = new List<ProductCategory>();
+            List<Product> products = new List<Product>();
             try
             {
                 DataTable dt = new DataTable();
@@ -27,29 +27,32 @@ namespace AWDAL.Production
                     {
                         Connection = connection,
                         CommandType = CommandType.Text,
-                        CommandText = "select idcategoria, nombre, descripcion, (case when condicion = 1 then 'Activo' else 'Desactivado' end) as condicion from dbo.categoria WHERE condicion = 1"
+                        CommandText = "SELECT articulo.idarticulo,articulo.codigo,articulo.nombre,articulo.descripcion,articulo.idcategoria,categoria.nombre AS Categoria,(case when dbo.articulo.condicion = 1 then 'Activo' else 'Desactivado' end) as condicion FROM articulo INNER JOIN categoria ON dbo.articulo.idcategoria = dbo.categoria.idcategoria where dbo.articulo.condicion = 1 order by articulo.nombre desc"
                     };
                     SqlDataAdapter adapter = new SqlDataAdapter(command);
                     adapter.Fill(dt);
                     var query = from item in dt.AsEnumerable()
-                                select new ProductCategory
+                                select new Product
                                 {
-                                    IDCategoria = Convert.ToInt32(item["idcategoria"]),
+                                    Idarticulo = Convert.ToInt32(item["idarticulo"]),
+                                    Idcategoria = Convert.ToInt32(item["idcategoria"]),
+                                    Codigo = Convert.ToString(item["codigo"]),
                                     Nombre = Convert.ToString(item["nombre"]),
                                     Descripcion = Convert.ToString(item["descripcion"]),
-                                    Condicion = Convert.ToString(item["condicion"])
+                                    Condicion = Convert.ToString(item["condicion"]),
+                                    Categoria = Convert.ToString(item["Categoria"])
                                 };
-                    categories = query.ToList();
+                    products = query.ToList();
                 }
             }
             catch(Exception ex)
             {
                 System.Console.Write(ex.Message);
             }
-            return categories;
+            return products;
         }
 
-        public static Result Insert(ProductCategory productCategory)
+        public static Result Insert(Product productCategory)
         {
             Result r = new Result();
             try
@@ -65,13 +68,17 @@ namespace AWDAL.Production
                     {
                         command.Connection = connection;
                         command.CommandType = CommandType.StoredProcedure;
-                        command.CommandText = "dbo.InsertCategory";
+                        command.CommandText = "dbo.InsertarProducto";
+                        command.Parameters.AddWithValue("@Codigo", productCategory.Codigo);
                         command.Parameters.AddWithValue("@Nombre", productCategory.Nombre);
                         command.Parameters.AddWithValue("@Descripcion", productCategory.Descripcion);
+                        command.Parameters.AddWithValue("@idcategoria", productCategory.Idcategoria);
                         command.Parameters.AddWithValue("@Condicion", 1);
+                        command.Parameters.AddWithValue("@precio_venta", 1.0);
+                        command.Parameters.AddWithValue("@stock", 1);
 
-                        command.Parameters.Add("@id_categoria", SqlDbType.Int);
-                        command.Parameters["@id_categoria"].Direction = ParameterDirection.Output;
+                        command.Parameters.Add("@idarticulo", SqlDbType.Int);
+                        command.Parameters["@idarticulo"].Direction = ParameterDirection.Output;
 
                         command.Parameters.Add("@return", SqlDbType.TinyInt);
                         command.Parameters["@return"].Direction = ParameterDirection.Output;
@@ -81,7 +88,7 @@ namespace AWDAL.Production
 
                         command.ExecuteNonQuery();
 
-                        r.Id = Convert.ToInt32(command.Parameters["@id_categoria"].Value);
+                        r.Id = Convert.ToInt32(command.Parameters["@idcategoria"].Value);
                         r.Outcome = Convert.ToInt32(command.Parameters["@return"].Value) == 0;
                         r.Message = Convert.ToString(command.Parameters["@return_message"].Value);
                     };
@@ -98,7 +105,7 @@ namespace AWDAL.Production
             return r;
         }
 
-        public static Result Update(ProductCategory productCategory)
+        public static Result Update(Product productCategory)
         {
             Result r = new Result();
             try
@@ -114,11 +121,13 @@ namespace AWDAL.Production
                     {
                         command.Connection = connection;
                         command.CommandType = CommandType.StoredProcedure;
-                        command.CommandText = "dbo.UpdateCategory";
+                        command.CommandText = "dbo.ActualizarProducto";
 
-                        command.Parameters.AddWithValue("@id_categoria", productCategory.IDCategoria);
+                        command.Parameters.AddWithValue("@idarticulo", productCategory.Idarticulo);
+                        command.Parameters.AddWithValue("@Codigo", productCategory.Codigo);
                         command.Parameters.AddWithValue("@Nombre", productCategory.Nombre);
                         command.Parameters.AddWithValue("@Descripcion", productCategory.Descripcion);
+                        command.Parameters.AddWithValue("@idcategoria", productCategory.Idcategoria);
                         command.Parameters.AddWithValue("@Condicion", 1);
 
                         command.Parameters.Add("@return", SqlDbType.TinyInt);
@@ -129,7 +138,7 @@ namespace AWDAL.Production
 
                         command.ExecuteNonQuery();
 
-                        r.Id = Convert.ToInt32(command.Parameters["@id_categoria"].Value);
+                        r.Id = Convert.ToInt32(command.Parameters["@idarticulo"].Value);
                         r.Outcome = Convert.ToInt32(command.Parameters["@return"].Value) == 0;
                         r.Message = Convert.ToString(command.Parameters["@return_message"].Value);
                     };
@@ -146,7 +155,7 @@ namespace AWDAL.Production
             return r;
         }
 
-        public static Result Delete(int IDCategoria)
+        public static Result Delete(int IDarticulo)
         {
             Result r = new Result();
             try
@@ -162,9 +171,9 @@ namespace AWDAL.Production
                     {
                         command.Connection = connection;
                         command.CommandType = CommandType.StoredProcedure;
-                        command.CommandText = "dbo.DeactivateCategory";
+                        command.CommandText = "dbo.DesactivarProducto";
 
-                        command.Parameters.AddWithValue("@id_categoria", IDCategoria);
+                        command.Parameters.AddWithValue("@idarticulo", IDarticulo);
 
                         command.Parameters.Add("@return", SqlDbType.TinyInt);
                         command.Parameters["@return"].Direction = ParameterDirection.Output;
@@ -174,7 +183,7 @@ namespace AWDAL.Production
 
                         command.ExecuteNonQuery();
 
-                        r.Id = Convert.ToInt32(command.Parameters["@id_categoria"].Value);
+                        r.Id = Convert.ToInt32(command.Parameters["@idarticulo"].Value);
                         r.Outcome = Convert.ToInt32(command.Parameters["@return"].Value) == 0;
                         r.Message = Convert.ToString(command.Parameters["@return_message"].Value);
                     };

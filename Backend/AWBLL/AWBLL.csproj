@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Production\ProductBll.cs" />
     <Compile Include="Production\ProductCategoryBll.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Admon\AuthenticationBLL.cs" />

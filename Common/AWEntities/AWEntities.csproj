@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authentication\user.cs" />
+    <Compile Include="Production\Product.cs" />
     <Compile Include="Production\ProductCategory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\Result.cs" />

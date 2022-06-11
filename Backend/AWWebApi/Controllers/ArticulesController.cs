@@ -12,36 +12,36 @@ using System.Web.Http.Cors;
 namespace AWWebApi.Controllers
 {
     [EnableCors(origins: "http://localhost:3000", headers: "*", methods: "*")]
-    public class CategoriesController : ApiController
+    public class ArticulesController : ApiController
     {
-        private readonly ProductCategoryBll categoryBll;
-        public CategoriesController()
+        private readonly ProductBll categoryBll;
+        public ArticulesController()
         {
-            categoryBll = new ProductCategoryBll();
+            categoryBll = new ProductBll();
         }
         // GET api/<controller>
-        public IEnumerable<ProductCategory> Get()
+        public IEnumerable<Product> Get()
         {
-            return ProductCategoryBll.Get();
+            return ProductBll.Get();
         }
 
 
         // POST api/<controller>
-        public Result Post([FromBody] ProductCategory productCategory)
+        public Result Post([FromBody] Product productCategory)
         {
-            return ProductCategoryBll.Insert(productCategory);
+            return ProductBll.Insert(productCategory);
         }
 
         // PUT api/<controller>/5
-        public Result Put([FromBody] ProductCategory productCategory)
+        public Result Put([FromBody] Product productCategory)
         {
-            return ProductCategoryBll.Update(productCategory);
+            return ProductBll.Update(productCategory);
         }
 
         // DELETE api/<controller>/5
         public Result Delete(int id)
         {
-            return ProductCategoryBll.Delete(id);
+            return ProductBll.Delete(id);
         }
     }
 }
